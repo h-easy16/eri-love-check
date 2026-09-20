@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>男性を見る目レベル診断(えり専用)</title>
+<style>
+:root{
+  --bg:#0f172a;
+  --card:#111827;
+  --card2:#1f2937;
+  --text:#f8fafc;
+  --muted:#94a3b8;
+  --line:#334155;
+  --accent:#f472b6;
+  --accent2:#a78bfa;
+  --good:#34d399;
+  --warn:#fbbf24;
+  --bad:#fb7185;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:
+radial-gradient(circle at top left,rgba(244,114,182,.16),transparent 35%),
+radial-gradient(circle at top right,rgba(167,139,250,.14),transparent 35%),
+var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Yu Gothic UI","Yu Gothic",sans-serif;min-height:100%}
+body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.app{width:min(760px,100%);margin:0 auto;padding:18px 16px 40px}
+.hero{padding:18px 4px 12px}
+.badge{display:inline-flex;gap:8px;align-items:center;padding:7px 11px;border:1px solid rgba(244,114,182,.35);border-radius:999px;background:rgba(244,114,182,.08);font-size:12px;color:#fbcfe8;font-weight:700}
+h1{font-size:30px;line-height:1.15;margin:14px 0 8px;letter-spacing:-.03em}
+.lead{margin:0;color:#cbd5e1;line-height:1.65;font-size:15px}
+.panel{background:rgba(17,24,39,.88);border:1px solid rgba(148,163,184,.16);box-shadow:0 18px 50px rgba(0,0,0,.22);border-radius:24px;padding:20px;margin-top:16px;backdrop-filter: blur(12px)}
+.progress-wrap{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.progress{height:9px;background:#263244;border-radius:999px;overflow:hidden;flex:1}
+.progress > div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0;transition:width .3s ease}
+.progress-text{color:var(--muted);font-size:12px;min-width:54px;text-align:right}
+.qno{font-size:12px;font-weight:800;color:#f9a8d4;letter-spacing:.08em;text-transform:uppercase}
+.question{font-size:21px;line-height:1.45;margin:7px 0 16px;font-weight:800}
+.scenario{color:#cbd5e1;background:#0b1220;border:1px solid rgba(148,163,184,.14);border-radius:16px;padding:13px 14px;line-height:1.6;margin:0 0 16px;font-size:14px}
+.answers{display:grid;gap:10px}
+.answer{width:100%;text-align:left;border:1px solid var(--line);background:#172033;color:var(--text);padding:14px 14px;border-radius:15px;font-size:15px;line-height:1.5;cursor:pointer;transition:.15s ease}
+.answer:active{transform:scale(.99)}
+.answer.selected{border-color:var(--accent);background:rgba(244,114,182,.12);box-shadow:0 0 0 2px rgba(244,114,182,.08)}
+.actions{display:flex;gap:10px;margin-top:18px}
+.btn{border:none;border-radius:14px;padding:13px 16px;font-weight:800;font-size:15px;cursor:pointer}
+.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;flex:1}
+.btn.secondary{background:#243047;color:#e2e8f0}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.hidden{display:none!important}
+.start-grid{display:grid;gap:12px;margin-top:18px}
+.feature{background:#0b1220;border:1px solid rgba(148,163,184,.14);border-radius:16px;padding:14px}
+.feature b{display:block;margin-bottom:4px}
+.feature span{font-size:13px;color:#94a3b8;line-height:1.55}
+.start-btn{width:100%;margin-top:18px;padding:15px;border-radius:16px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:16px;font-weight:900}
+.note{font-size:12px;color:#64748b;line-height:1.6;margin-top:14px}
+.result-top{text-align:center;padding:4px 0 12px}
+.score-ring{--p:0;display:grid;place-items:center;width:150px;height:150px;margin:6px auto 14px;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--p)*1%), #293548 0);position:relative}
+.score-ring::after{content:"";position:absolute;inset:12px;border-radius:50%;background:#111827}
+.score-inner{position:relative;z-index:1}
+.score-num{font-size:44px;font-weight:950;letter-spacing:-.04em}
+.score-unit{font-size:12px;color:#94a3b8}
+.rank{font-size:24px;font-weight:900;margin:2px 0 6px}
+.rank-sub{color:#cbd5e1;font-size:14px;line-height:1.6}
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.metric{background:#0b1220;border:1px solid rgba(148,163,184,.14);border-radius:16px;padding:13px}
+.metric-name{font-size:12px;color:#94a3b8}
+.metric-value{font-size:21px;font-weight:900;margin-top:4px}
+.bar{height:7px;background:#263244;border-radius:999px;overflow:hidden;margin-top:8px}
+.bar>div{height:100%;background:linear-gradient(90deg,var(--good),var(--accent2))}
+.result-box{margin-top:14px;padding:15px;border-radius:16px;background:#0b1220;border:1px solid rgba(148,163,184,.14)}
+.result-box h3{font-size:15px;margin:0 0 8px}
+.result-box p{margin:0;color:#cbd5e1;line-height:1.7;font-size:14px}
+.tip-list{margin:0;padding-left:20px;color:#cbd5e1;line-height:1.75;font-size:14px}
+.footer-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.small{font-size:11px;color:#64748b;text-align:center;margin-top:16px;line-height:1.6}
+@media(max-width:520px){
+  .app{padding-left:14px;padding-right:14px}
+  h1{font-size:27px}
+  .panel{padding:17px;border-radius:20px}
+  .question{font-size:19px}
+  .result-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="hero">
+    <div class="badge">💘 LOVE JUDGMENT CHECK</div>
+    <h1>男性を見る目レベル診断(えり専用)</h1>
+    <p class="lead">甘い言葉より行動を見る。肩書きより人柄を見る。さらに、強い「オスみ」やイケメン補正に惑わされず、恋愛でちゃんと相手を見抜けているかを20の場面でチェックします。</p>
+  </header>
+
+  <section id="start" class="panel">
+    <div class="start-grid">
+      <div class="feature"><b>🔎 見抜くポイント</b><span>誠実さ、一貫性、境界線、責任感、感情コントロールに加え、オスみ耐性・イケメン補正耐性も判定。</span></div>
+      <div class="feature"><b>🧠 形式</b><span>実際の恋愛で起こりそうな場面から「あなたならどう判断するか」を選択。</span></div>
+      <div class="feature"><b>📱 完全オフライン</b><span>回答は外部送信されません。このHTMLファイルの中だけで動きます。</span></div>
+    </div>
+    <button id="startBtn" class="start-btn">診断をはじめる</button>
+    <p class="note">※ 娯楽・自己理解向けの診断です。人の価値を決めるものでも、恋愛結果を予測するものでもありません。</p>
+  </section>
+
+  <section id="quiz" class="panel hidden">
+    <div class="progress-wrap">
+      <div class="progress"><div id="progressBar"></div></div>
+      <div id="progressText" class="progress-text"></div>
+    </div>
+    <div id="qNo" class="qno"></div>
+    <div id="question" class="question"></div>
+    <div id="scenario" class="scenario"></div>
+    <div id="answers" class="answers"></div>
+    <div class="actions">
+      <button id="backBtn" class="btn secondary">戻る</button>
+      <button id="nextBtn" class="btn primary" disabled>次へ</button>
+    </div>
+  </section>
+
+  <section id="result" class="panel hidden">
+    <div class="result-top">
+      <div id="scoreRing" class="score-ring">
+        <div class="score-inner">
+          <div id="scoreNum" class="score-num">0</div>
+          <div class="score-unit">/ 100</div>
+        </div>
+      </div>
+      <div id="rank" class="rank"></div>
+      <div id="rankSub" class="rank-sub"></div>
+    </div>
+
+    <div id="metrics" class="result-grid"></div>
+
+    <div class="result-box">
+      <h3>あなたの傾向</h3>
+      <p id="summary"></p>
+    </div>
+
+    <div class="result-box">
+      <h3>今後さらに見るべきポイント</h3>
+      <ul id="tips" class="tip-list"></ul>
+    </div>
+
+    <div class="footer-actions">
+      <button id="retryBtn" class="btn secondary">もう一度</button>
+      <button id="shareBtn" class="btn primary">結果を共有</button>
+    </div>
+    <div class="small">この診断は医学・心理学的な評価ではありません。危険や支配、暴力、不安を感じる関係では診断結果より安全を優先してください。</div>
+  </section>
+</div>
+
+<script>
+const questions = [
+  {
+    cat:"consistency",
+    q:"初対面でとても優しい男性。何を重視する？",
+    s:"会ってすぐ「こんなに気が合う人は初めて」「運命かも」と強く好意を示してきました。",
+    a:[
+      ["こんなに好かれるなら信用できそう",0],
+      ["言葉は嬉しいが、しばらく行動の一貫性を見る",3],
+      ["友達に人気があるかで判断する",1],
+      ["仕事や年収が良ければ前向きに考える",1]
+    ]
+  },
+  {
+    cat:"respect",
+    q:"店員への態度が悪い。あなたの判断は？",
+    s:"あなたには優しいのに、飲食店で店員に高圧的な態度をとっています。",
+    a:[
+      ["自分に優しいなら問題ない",0],
+      ["疲れているだけだと思う",1],
+      ["立場が弱い人への態度は人柄を見る材料にする",3],
+      ["男らしくて頼もしいと思う",0]
+    ]
+  },
+  {
+    cat:"boundary",
+    q:"断ったときの反応で何を見る？",
+    s:"今日は会えないと伝えたところ、『俺のこと好きなら来るでしょ？』と言われました。",
+    a:[
+      ["少し無理してでも会う",0],
+      ["愛情表現だと思う",1],
+      ["こちらのNOを尊重できるかを見る",3],
+      ["機嫌が直るまで謝る",0]
+    ]
+  },
+  {
+    cat:"accountability",
+    q:"元カノの話。どんな男性を警戒する？",
+    s:"過去の恋愛について話しています。",
+    a:[
+      ["元カノ全員を『頭がおかしい女だった』と言う",3],
+      ["自分にも悪かった点があると言う",0],
+      ["別れた理由を冷静に説明する",0],
+      ["相手のプライバシーに配慮して詳しく話さない",0]
+    ],
+    reverse:true
+  },
+  {
+    cat:"consistency",
+    q:"LINEは甘い。でも予定が決まらない。",
+    s:"毎日『会いたい』『好き』と言う一方で、具体的なデートの日程はいつも曖昧です。",
+    a:[
+      ["言葉より、実際に時間を作るかを見る",3],
+      ["毎日LINEが来るなら十分",1],
+      ["忙しい人ほど魅力的なので気にしない",0],
+      ["もっとこちらから追いかける",0]
+    ]
+  },
+  {
+    cat:"emotion",
+    q:"怒ったときの態度。どれを重要視する？",
+    s:"意見が食い違ったとき、男性が不機嫌になりました。",
+    a:[
+      ["怒るのは本気で向き合っている証拠",0],
+      ["怒っても侮辱・威圧せず話し合えるかを見る",3],
+      ["翌日プレゼントをくれれば気にしない",1],
+      ["私が怒らせないように気をつける",0]
+    ]
+  },
+  {
+    cat:"responsibility",
+    q:"お金の使い方を見るなら？",
+    s:"高収入をアピールしていますが、支払い遅延や借金の話も出てきました。",
+    a:[
+      ["高収入なら問題ない",1],
+      ["稼ぎより、支払い・貯蓄・借金への向き合い方を見る",3],
+      ["高い店に連れて行ってくれるかを見る",0],
+      ["車や時計の値段で判断する",0]
+    ]
+  },
+  {
+    cat:"respect",
+    q:"友達の前であなたをいじる男性。",
+    s:"あなたが嫌がっていることを、笑いを取るために何度もネタにします。",
+    a:[
+      ["面白い人だから仕方ない",0],
+      ["場を盛り上げてくれるなら我慢する",1],
+      ["嫌だと伝えた後にやめるかを見る",3],
+      ["人気者なら気にしない",0]
+    ]
+  },
+  {
+    cat:"boundary",
+    q:"スマホを見せてと言われた。",
+    s:"『付き合うなら隠し事なしでしょ』と言って、パスコード共有を求められました。",
+    a:[
+      ["愛されている証拠なので渡す",0],
+      ["お互い交換するなら公平",1],
+      ["恋人でもプライバシーと信頼は別だと考える",3],
+      ["嫌われたくないので渡す",0]
+    ]
+  },
+  {
+    cat:"accountability",
+    q:"ミスしたとき、どんな反応を評価する？",
+    s:"男性がデートの予約日を間違えていました。",
+    a:[
+      ["店のせいにする",0],
+      ["あなたの確認不足だと言う",0],
+      ["自分のミスを認め、謝って代案を出す",3],
+      ["謝る代わりに高い物を買う",1]
+    ]
+  },
+  {
+    cat:"emotion",
+    q:"嫉妬が強い男性について。",
+    s:"男性があなたの男友達や同僚との会話を細かく確認したがります。",
+    a:[
+      ["嫉妬するほど愛されている",0],
+      ["多少なら可愛いと思う",1],
+      ["感情は理解しても、監視や制限につながらないか見る",3],
+      ["安心させるため異性との交流を全部やめる",0]
+    ]
+  },
+  {
+    cat:"consistency",
+    q:"あなたが弱っているときの態度。",
+    s:"仕事で落ち込んでいると伝えました。",
+    a:[
+      ["普段より連絡が減っても気にしない",1],
+      ["話を聞く、休ませるなど実際の配慮があるかを見る",3],
+      ["高価なプレゼントをくれれば満足",1],
+      ["SNSで励ましてくれれば十分",0]
+    ]
+  },
+  {
+    cat:"responsibility",
+    q:"仕事への向き合い方で重視するのは？",
+    s:"肩書きや収入ではなく、日常的な姿勢を見る場面です。",
+    a:[
+      ["有名企業に勤めているか",1],
+      ["他人のせいにせず、自分の役割を果たしているか",3],
+      ["とにかく年収が高いか",0],
+      ["忙しさを自慢しているか",0]
+    ]
+  },
+  {
+    cat:"respect",
+    q:"あなたの夢や仕事への反応。",
+    s:"あなたが挑戦したいことを話したら、『そんなの無理じゃない？』と言われました。",
+    a:[
+      ["現実を教えてくれる良い男性だと思う",1],
+      ["理由を聞き、応援か建設的な意見か、ただの否定かを見る",3],
+      ["相手に合わせて諦める",0],
+      ["年上なら判断が正しいと思う",0]
+    ]
+  },
+  {
+    cat:"accountability",
+    q:"謝り方で最も信頼できるのは？",
+    s:"男性があなたを傷つける発言をしました。",
+    a:[
+      ["『そんなつもりじゃなかった』だけ",1],
+      ["『傷ついたならごめん』",1],
+      ["何が悪かったか理解し、謝罪して行動を変える",3],
+      ["プレゼントを渡して話を終わらせる",0]
+    ]
+  },
+  {
+    cat:"masculine",
+    q:"『オスみ』が強い男性。何を見落とさない？",
+    s:"自信があり、距離の詰め方もうまく、目線や話し方にも強い色気があります。かなり惹かれています。",
+    a:[
+      ["本能的に惹かれるなら相性が良い証拠",0],
+      ["色気と誠実さは別物として、約束や態度の一貫性を見る",3],
+      ["他の女性にもモテそうなら価値が高いと思う",1],
+      ["強引なくらいの方が男らしくて安心する",0]
+    ]
+  },
+  {
+    cat:"masculine",
+    q:"押しの強さと頼もしさ、どう見分ける？",
+    s:"男性が『俺に任せて』『考えなくていいよ』と何でも主導してくれます。",
+    a:[
+      ["全部決めてくれる男性は頼れる",1],
+      ["こちらの希望やNOも尊重してくれるかを見る",3],
+      ["迷わない男性ほど恋愛では正解",0],
+      ["強く引っ張られると安心するので任せる",0]
+    ]
+  },
+  {
+    cat:"looks",
+    q:"かなりのイケメン。でも小さな違和感がある。",
+    s:"見た目は完全に好み。ただ、約束の時間に遅れる・謝らない・話を少し盛ることがあります。",
+    a:[
+      ["顔が好みなら多少は許せる",0],
+      ["小さな違和感も、普通の相手と同じ基準で見る",3],
+      ["モテる人ならそれくらい仕方ない",0],
+      ["付き合ってから直してもらえばいい",1]
+    ]
+  },
+  {
+    cat:"looks",
+    q:"見た目が好みだと、評価基準は変わる？",
+    s:"同じ行動でも、相手がタイプの男性だと少し良く見えてしまいそうです。",
+    a:[
+      ["多少甘くなるのは自然なので気にしない",1],
+      ["自分が甘くなっている可能性を意識して、行動ベースで見直す",3],
+      ["イケメンなら多少の欠点も個性",0],
+      ["周囲の女性から人気なら安心材料になる",0]
+    ]
+  },
+  {
+    cat:"boundary",
+    q:"最終問題。強く惹かれる相手ほど何を忘れない？",
+    s:"ルックスも会話も完璧。オスみも強く、かなり惹かれています。",
+    a:[
+      ["直感を信じて一気に関係を進める",1],
+      ["惹かれていても、自分の基準と境界線を保つ",3],
+      ["欠点には目をつぶる",0],
+      ["周囲が羨む相手なら間違いない",0]
+    ]
+  }
+];
+
+const cats = {
+  consistency:"一貫性",
+  respect:"尊重",
+  boundary:"境界線",
+  accountability:"誠実さ",
+  emotion:"感情安定",
+  responsibility:"責任感",
+  masculine:"オスみ耐性",
+  looks:"イケメン補正耐性"
+};
+
+let idx=0;
+let answers=Array(questions.length).fill(null);
+
+const $ = id => document.getElementById(id);
+
+function showQuiz(){
+  $("start").classList.add("hidden");
+  $("result").classList.add("hidden");
+  $("quiz").classList.remove("hidden");
+  render();
+}
+
+function render(){
+  const q = questions[idx];
+  $("qNo").textContent=`QUESTION ${idx+1}`;
+  $("question").textContent=q.q;
+  $("scenario").textContent=q.s;
+  $("progressBar").style.width=`${((idx+1)/questions.length)*100}%`;
+  $("progressText").textContent=`${idx+1} / ${questions.length}`;
+  const wrap=$("answers");
+  wrap.innerHTML="";
+  q.a.forEach((item,i)=>{
+    const b=document.createElement("button");
+    b.className="answer"+(answers[idx]===i?" selected":"");
+    b.textContent=item[0];
+    b.onclick=()=>{
+      answers[idx]=i;
+      [...wrap.children].forEach((x,n)=>x.classList.toggle("selected",n===i));
+      $("nextBtn").disabled=false;
+    };
+    wrap.appendChild(b);
+  });
+  $("backBtn").disabled=idx===0;
+  $("nextBtn").disabled=answers[idx]===null;
+  $("nextBtn").textContent=idx===questions.length-1?"結果を見る":"次へ";
+}
+
+function getScoreForQuestion(q, choice){
+  const raw=q.a[choice][1];
+  if(q.reverse){
+    return raw===3?0:3;
+  }
+  return raw;
+}
+
+function calc(){
+  let total=0;
+  const catTotals={};
+  const catMax={};
+  questions.forEach((q,i)=>{
+    const s=getScoreForQuestion(q,answers[i]);
+    total+=s;
+    catTotals[q.cat]=(catTotals[q.cat]||0)+s;
+    catMax[q.cat]=(catMax[q.cat]||0)+3;
+  });
+  const max=questions.length*3;
+  const score=Math.round(total/max*100);
+  const metrics={};
+  Object.keys(cats).forEach(k=>{
+    metrics[k]=Math.round((catTotals[k]||0)/(catMax[k]||3)*100);
+  });
+  return {score,metrics};
+}
+
+function resultText(score){
+  if(score>=90) return {
+    rank:"見る目レベル：S",
+    sub:"かなり冷静。オスみやイケメン補正に流されず、人柄を行動で見られるタイプ。",
+    summary:"好意・肩書き・勢いよりも、相手の一貫した行動や尊重の姿勢を重視できています。恋愛中でも自分の判断基準を保ちやすい傾向です。"
+  };
+  if(score>=75) return {
+    rank:"見る目レベル：A",
+    sub:"かなり優秀。ただし強く惹かれた相手では判断が甘くなる余地あり。",
+    summary:"基本的には危険サインと健全なサインを見分けられています。『イケメンだから』『オスみがあるから』『好きだから』を例外理由にしないことが、さらに見る目を安定させます。"
+  };
+  if(score>=60) return {
+    rank:"見る目レベル：B",
+    sub:"平均以上。でも甘い言葉や勢いに押される場面が少しあります。",
+    summary:"重要なポイントは押さえていますが、好意・年収・ステータス・嫉妬に加え、オスみやルックスを安心材料として高く評価しすぎる場面がありそうです。"
+  };
+  if(score>=40) return {
+    rank:"見る目レベル：C",
+    sub:"感情が判断を上書きしやすいタイプ。",
+    summary:"相手の魅力や『自分を好きでいてくれること』を、人柄の良さと結びつけやすい傾向があります。言葉ではなく、時間をかけて行動を見ると判断がかなり安定します。"
+  };
+  return {
+    rank:"見る目レベル：D",
+    sub:"恋愛フィルターが強め。赤信号までピンクに見えている可能性あり。",
+    summary:"好意・嫉妬・高収入・強引さ・オスみ・イケメン補正を魅力として受け取りやすく、境界線や責任感を後回しにしがちな傾向です。相手選びでは『自分が安心してNOと言えるか』を最優先にすると見え方が変わります。"
+  };
+}
+
+function showResult(){
+  const {score,metrics}=calc();
+  const t=resultText(score);
+  $("quiz").classList.add("hidden");
+  $("result").classList.remove("hidden");
+  $("scoreNum").textContent=score;
+  $("scoreRing").style.setProperty("--p",score);
+  $("rank").textContent=t.rank;
+  $("rankSub").textContent=t.sub;
+  $("summary").textContent=t.summary;
+
+  const m=$("metrics");
+  m.innerHTML="";
+  Object.entries(metrics).forEach(([k,v])=>{
+    const el=document.createElement("div");
+    el.className="metric";
+    el.innerHTML=`<div class="metric-name">${cats[k]}</div>
+      <div class="metric-value">${v}</div>
+      <div class="bar"><div style="width:${v}%"></div></div>`;
+    m.appendChild(el);
+  });
+
+  const weak=Object.entries(metrics).sort((a,b)=>a[1]-b[1]).slice(0,2).map(x=>x[0]);
+  const tipMap={
+    consistency:"言葉の強さではなく、約束・連絡・態度が時間を通じて一貫しているかを見る。",
+    respect:"あなた以外の人、特に店員・家族・部下・元恋人への接し方も観察する。",
+    boundary:"NOを言ったときに、説得・罪悪感・不機嫌で押し切ろうとしないかを見る。",
+    accountability:"謝罪よりも、その後に同じことを繰り返さないかを見る。",
+    emotion:"怒りや嫉妬の『強さ』より、感情をどう扱う人かを見る。",
+    responsibility:"収入や肩書きより、約束・お金・仕事・生活への責任の取り方を見る。",
+    masculine:"色気・自信・押しの強さを『誠実さ』と混同しない。惹かれるほど、NOを尊重するかと行動の一貫性を見る。",
+    looks:"顔が好みな相手ほど採点を甘くしない。同じ行動を、好みではない男性がした場合でも許せるか考える。"
+  };
+  const tips=$("tips");
+  tips.innerHTML="";
+  weak.forEach(k=>{
+    const li=document.createElement("li");
+    li.textContent=tipMap[k];
+    tips.appendChild(li);
+  });
+  const li=document.createElement("li");
+  li.textContent="強く惹かれた相手ほど、判断を急がず『3か月後も同じ態度か』を見る。";
+  tips.appendChild(li);
+
+  localStorage.setItem("loveJudgmentLast",JSON.stringify({score,metrics,date:new Date().toISOString()}));
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+$("startBtn").onclick=showQuiz;
+$("backBtn").onclick=()=>{if(idx>0){idx--;render();}};
+$("nextBtn").onclick=()=>{
+  if(answers[idx]===null)return;
+  if(idx<questions.length-1){idx++;render();}
+  else showResult();
+};
+$("retryBtn").onclick=()=>{
+  idx=0;
+  answers=Array(questions.length).fill(null);
+  $("result").classList.add("hidden");
+  $("start").classList.remove("hidden");
+  window.scrollTo({top:0,behavior:"smooth"});
+};
+$("shareBtn").onclick=async()=>{
+  const {score}=calc();
+  const t=resultText(score);
+  const text=`男性を見る目レベル診断(えり専用)\n${t.rank} / ${score}点\n${t.sub}`;
+  try{
+    if(navigator.share){
+      await navigator.share({title:"男性を見る目レベル診断(えり専用)",text});
+    }else if(navigator.clipboard){
+      await navigator.clipboard.writeText(text);
+      alert("結果をコピーしました");
+    }else{
+      alert(text);
+    }
+  }catch(e){}
+};
+</script>
+</body>
+</html>
